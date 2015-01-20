@@ -16,6 +16,5 @@ urlpatterns = patterns('',
     # url(r'^admin/', include(admin.site.urls)),
     #(r'^hello/', 'hello.views.current'),
     #(r'^admin/', include('django.contrib.admin.urls')),
-    (r'^', include('hello.urls')),
     (r'^', include('guestbook.urls')),
 )

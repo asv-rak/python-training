@@ -1,6 +1,8 @@
+import logging
+
 __author__ = 'fatatoopc'
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 
 from google.appengine.api import users
 
@@ -32,10 +34,12 @@ def main_page(request):
         'url': url,
         'url_linktext': url_linktext,
     }
-    return render_to_response(request, 'guestbook/main_page.html', template_values)
+    return render(request, 'guestbook/main_page.html', template_values)
+
 
 def sign_post(request):
     if request.method == 'POST':
+        logging.warning("access!!!!!!!!!@#!@$#%^$&^*%$%^&*^%$#%^&%^$")
         guestbook_name = request.POST.get('guestbook_name')
         greeting = Greeting(parent=guestbook_key(guestbook_name))
 
