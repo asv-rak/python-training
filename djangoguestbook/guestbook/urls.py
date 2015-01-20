@@ -1,4 +1,3 @@
-__author__ = 'fatatoopc'
 from django.conf.urls import *
 from guestbook.views import main_page, sign_post
 
