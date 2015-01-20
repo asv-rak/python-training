@@ -90,7 +90,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'djangoguestbook.urls'
+ROOT_URLCONF = 'urls'
 #tu chinh sua
 ROOT_PATH = os.path.dirname(__file__)
 TEMPLATE_DIRS = (os.path.join(ROOT_PATH, "templates"),)

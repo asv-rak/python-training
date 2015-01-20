@@ -1,5 +1,5 @@
 import os,sys
-os.environ['DJANGO_SETTINGS_MODULE'] = 'djangoguestbook.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
 # Google App Engine imports.
 from google.appengine.ext.webapp import util
