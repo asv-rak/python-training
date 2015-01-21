@@ -5,7 +5,6 @@ from guestbook.models import Greeting, guestbook_key, DEFAULT_GUESTBOOK_NAME
 from google.appengine.api import memcache
 import urllib
 import logging
-import cStringIO
 
 def main_page(request):
     guestbook_name = request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
@@ -50,10 +49,7 @@ def get_greetings(guestbook_name):
     return greetings
 
 def render_greetings(guestbook_name):
-    logging.warning("done 1 !!!!!!!!!@#!@$#%^$&^*%$%^&*^%$#%^&%^$")
     greetings_query = Greeting.query(
         ancestor=guestbook_key(guestbook_name)).order(-Greeting.date)
     greetings = greetings_query.fetch(10)
-    output = cStringIO.StringIO()
-    logging.warning('Memcache set failed.')
     return greetings
