@@ -12,9 +12,6 @@
       <blockquote>{{ greeting.content|escape }}</blockquote>
     {% endfor %}
 
-    <b>Cache Hits: {{statshits}}</b></br>
-    <b>Cache Misses: {{statsmisses}}</b><br><br>
-
     <form action="/sign/" method="post">
       {% csrf_token %}
       <input type="hidden" name="guestbook_name" value="{{ guestbook_name }}" />
