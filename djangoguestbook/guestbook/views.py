@@ -1,10 +1,10 @@
+import urllib
+import logging
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from google.appengine.api import users
-from guestbook.models import Greeting, get_guestbook_key, DEFAULT_GUESTBOOK_NAME
-import urllib
-import logging
 from google.appengine.api import memcache
+from guestbook.models import Greeting, get_guestbook_key, DEFAULT_GUESTBOOK_NAME
 
 def main_page(request):
     guestbook_name = request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
@@ -48,6 +48,6 @@ def get_greetings(guestbook_name):
     else:
         greetings_query = Greeting.query(ancestor=get_guestbook_key(guestbook_name)).order(-Greeting.date)
         greetings = greetings_query.fetch(10)
-        if not memcache.add('%s:greetings' % guestbook_name, greetings, 10):
+        if not memcache.set('%s:greetings' % guestbook_name, greetings):
             logging.error('Memcache set failed.')
     return greetings
