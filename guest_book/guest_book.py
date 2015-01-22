@@ -7,7 +7,6 @@ import os
 import logging
 import urllib
 import webapp2
-import datetime
 JINJA2_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
