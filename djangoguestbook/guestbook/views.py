@@ -2,9 +2,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from google.appengine.api import users
 from guestbook.models import Greeting, get_guestbook_key, DEFAULT_GUESTBOOK_NAME
-from google.appengine.api import memcache
 import urllib
 import logging
+from google.appengine.api import memcache
 
 def main_page(request):
     guestbook_name = request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
