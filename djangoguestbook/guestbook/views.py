@@ -3,7 +3,7 @@ from django.views.generic.base import TemplateView
 from django.http import HttpResponseRedirect
 from google.appengine.api import users
 from google.appengine.api import memcache
-from guestbook.models import Greeting, Guestbook, DEFAULT_GUESTBOOK_NAME
+from guestbook.models import Greeting, DEFAULT_GUESTBOOK_NAME
 
 
 class GreetingView(TemplateView):
@@ -12,7 +12,8 @@ class GreetingView(TemplateView):
 
 	def get_context_data(self, **kwargs):
 		guestbook_name = self.request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
-		greetings = Guestbook.get_greetings(guestbook_name)
+		greetings = Greeting.get_lastest(guestbook_name, 10, self.force_new)
+		self.force_new = False
 		if users.get_current_user():
 			url = users.create_logout_url(self.request.get_full_path())
 			url_linktext = 'Logout'
@@ -38,12 +39,12 @@ class GreetingView(TemplateView):
 			greeting.put()
 			context = HttpResponseRedirect(
 				'/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
-			GreetingView.force_new = True
+			self.force_new = True
 		else:
 			context = HttpResponseRedirect('/')
-		if GreetingView.force_new:
+		if self.force_new:
 			GreetingView.update_memcache(self, guestbook_name, greeting)
-			GreetingView.force_new = False
+			self.force_new = False
 		return context
 
 	# update to memcache
