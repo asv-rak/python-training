@@ -1,10 +1,11 @@
-from django.views.generic.base import TemplateView
-from guestbook.models import Greeting, get_guestbook_key, DEFAULT_GUESTBOOK_NAME
-from google.appengine.api import users
-from django.http import HttpResponseRedirect
-from google.appengine.api import memcache
 import urllib
 import logging
+from django.views.generic.base import TemplateView
+from django.http import HttpResponseRedirect
+from google.appengine.api import users
+from google.appengine.api import memcache
+from guestbook.models import Greeting, get_guestbook_key, DEFAULT_GUESTBOOK_NAME
+
 class GreetingView(TemplateView):
     template_name = "guestbook/main_page.html"
 
@@ -12,10 +13,10 @@ class GreetingView(TemplateView):
         guestbook_name = self.request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
         greetings = get_greetings(guestbook_name)
         if users.get_current_user():
-            url = users.create_logout_url(request.get_full_path())
+            url = users.create_logout_url(self.request.get_full_path())
             url_linktext = 'Logout'
         else:
-            url = users.create_login_url(request.get_full_path())
+            url = users.create_login_url(self.request.get_full_path())
             url_linktext = 'Login'
         template_values = {
             'greetings': greetings,
@@ -24,7 +25,7 @@ class GreetingView(TemplateView):
             'url_linktext': url_linktext,
         }
         context = template_values
-        return self.render_to_response(context)
+        return context
 
     def post(self, request, *args, **kwargs):
         if request.method == 'POST':
