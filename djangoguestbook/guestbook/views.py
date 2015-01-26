@@ -1,18 +1,17 @@
 import urllib
-import logging
 from django.views.generic.base import TemplateView
 from django.http import HttpResponseRedirect
 from google.appengine.api import users
 from google.appengine.api import memcache
-from guestbook.models import Greeting, get_guestbook_key, DEFAULT_GUESTBOOK_NAME
+from guestbook.models import Greeting, Guestbook, DEFAULT_GUESTBOOK_NAME
 
 
 class GreetingView(TemplateView):
 	template_name = "guestbook/main_page.html"
-
+	
 	def get_context_data(self, **kwargs):
 		guestbook_name = self.request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
-		greetings = get_greetings(guestbook_name)
+		greetings = Guestbook.get_greetings(guestbook_name)
 		if users.get_current_user():
 			url = users.create_logout_url(self.request.get_full_path())
 			url_linktext = 'Logout'
@@ -31,7 +30,7 @@ class GreetingView(TemplateView):
 	def post(self, request):
 		if request.method == 'POST':
 			guestbook_name = request.POST.get('guestbook_name')
-			greeting = Greeting(parent=get_guestbook_key(guestbook_name))
+			greeting = Greeting(parent=Guestbook.get_guestbook_key(guestbook_name))
 			if users.get_current_user():
 				greeting.author = users.get_current_user()
 			greeting.content = request.POST.get('content')
@@ -47,17 +46,7 @@ class GreetingView(TemplateView):
 		return context
 
 
-def get_greetings(guestbook_name):
-	greetings = memcache.get('%s:greetings' % guestbook_name)
-	if greetings is not None:
-		return greetings
-	else:
-		greetings_query = Greeting.query(ancestor=get_guestbook_key(guestbook_name)).order(
-			-Greeting.date)
-		greetings = greetings_query.fetch(10)
-		if not memcache.add('%s:greetings' % guestbook_name, greetings, 10):
-			logging.error('Memcache set failed.')
-	return greetings
+
 
 
 
