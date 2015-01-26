@@ -6,6 +6,7 @@ DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
 # entity group. Queries across the single entity group will be consistent.
 # However, the write rate should be limited to ~1/second.
 
+
 def get_guestbook_key(guestbook_name=DEFAULT_GUESTBOOK_NAME):
     '''Constructs a Datastore key for a Guestbook entity with guestbook_name.'''
     return ndb.Key('Guestbook', guestbook_name)

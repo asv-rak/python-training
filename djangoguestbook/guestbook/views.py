@@ -6,6 +6,7 @@ from google.appengine.api import users
 from google.appengine.api import memcache
 from guestbook.models import Greeting, get_guestbook_key, DEFAULT_GUESTBOOK_NAME
 
+
 class GreetingView(TemplateView):
     template_name = "guestbook/main_page.html"
 
@@ -27,28 +28,32 @@ class GreetingView(TemplateView):
         context = template_values
         return context
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         if request.method == 'POST':
             guestbook_name = request.POST.get('guestbook_name')
-            greeting = Greeting(parent= get_guestbook_key(guestbook_name))
+            greeting = Greeting(parent=get_guestbook_key(guestbook_name))
             if users.get_current_user():
                 greeting.author = users.get_current_user()
             greeting.content = request.POST.get('content')
             greeting.put()
-            #update to memcache
+            # update to memcache
             greetings = memcache.get('%s:greetings' % guestbook_name)
-            greetings.insert(0,greeting)
+            greetings.insert(0, greeting)
             memcache.set('%s:greetings' % guestbook_name, greetings)
-            context = HttpResponseRedirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
-        else: context = HttpResponseRedirect('/')
+            context = HttpResponseRedirect(
+                '/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
+        else:
+            context = HttpResponseRedirect('/')
         return context
+
 
 def get_greetings(guestbook_name):
     greetings = memcache.get('%s:greetings' % guestbook_name)
     if greetings is not None:
         return greetings
     else:
-        greetings_query = Greeting.query(ancestor=get_guestbook_key(guestbook_name)).order(-Greeting.date)
+        greetings_query = Greeting.query(ancestor=get_guestbook_key(guestbook_name)).order(
+            -Greeting.date)
         greetings = greetings_query.fetch(10)
         if not memcache.add('%s:greetings' % guestbook_name, greetings, 10):
             logging.error('Memcache set failed.')
