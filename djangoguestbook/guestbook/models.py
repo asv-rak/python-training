@@ -30,13 +30,13 @@ class Greeting(ndb.Model):
 			if greetings is not None:
 				return greetings
 			else:
-				cls.get_query_update_memcache(guestbook_name, count)
+				cls.prefix_query_update_memcache(guestbook_name, count)
 		else:
-			cls.get_query_update_memcache(guestbook_name, count)
+			cls.prefix_query_update_memcache(guestbook_name, count)
 		return greetings
 
 	@classmethod
-	def get_query_update_memcache(self, guestbook_name, count):
+	def prefix_query_update_memcache(self, guestbook_name, count):
 		greetings_query = Greeting.query(ancestor=ndb.Key(Greeting, guestbook_name)).order(
 			-Greeting.date)
 		greetings = greetings_query.fetch(count)

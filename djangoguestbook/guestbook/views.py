@@ -42,16 +42,8 @@ class GreetingView(TemplateView):
 			self.force_new = True
 		else:
 			context = HttpResponseRedirect('/')
-		if self.force_new:
-			GreetingView.update_memcache(self, guestbook_name, greeting)
-			self.force_new = False
 		return context
 
-	# update to memcache
-	def update_memcache(self, guestbook_name, greeting):
-		greetings = memcache.get('%s:greetings' % guestbook_name)
-		greetings.insert(0, greeting)
-		memcache.set('%s:greetings' % guestbook_name, greetings)
 
 
 
