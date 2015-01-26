@@ -7,8 +7,9 @@ import urllib
 import logging
 class GreetingView(TemplateView):
     template_name = "guestbook/main_page.html"
-    def get(self, request, *args, **kwargs):
-        guestbook_name = request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
+
+    def get_context_data(self, **kwargs):
+        guestbook_name = self.request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
         greetings = get_greetings(guestbook_name)
         if users.get_current_user():
             url = users.create_logout_url(request.get_full_path())
