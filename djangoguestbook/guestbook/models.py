@@ -15,21 +15,24 @@ class Greeting(ndb.Model):
 	content = ndb.StringProperty(indexed=False)
 	date = ndb.DateTimeProperty(auto_now_add=True)
 
+	@classmethod
+	def creat_greeting(cls, guestbook_name):
+		return Greeting(parent=Greeting.get_lastest(guestbook_name))
 
-class Guestbook():
-	@staticmethod
-	def get_guestbook_key(guestbook_name=DEFAULT_GUESTBOOK_NAME):
-		'''Constructs a Datastore key for a Guestbook entity with guestbook_name.'''
+	@classmethod
+	def get_lastest(cls, guestbook_name=DEFAULT_GUESTBOOK_NAME):
 		return ndb.Key('Guestbook', guestbook_name)
 
-	@staticmethod
-	def get_greetings(guestbook_name):
+
+class Guestbook():
+	@classmethod
+	def get_greetings(cls, guestbook_name):
 		greetings = memcache.get('%s:greetings' % guestbook_name)
 		if greetings is not None:
 			return greetings
 		else:
 			greetings_query = Greeting.query(
-				ancestor=Guestbook.get_guestbook_key(guestbook_name)).order(
+				ancestor=Greeting.get_lastest(guestbook_name)).order(
 				-Greeting.date)
 			greetings = greetings_query.fetch(10)
 			if not memcache.add('%s:greetings' % guestbook_name, greetings, 10):
