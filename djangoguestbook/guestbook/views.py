@@ -30,7 +30,11 @@ class GreetingView(TemplateView):
 
 	def post(self, request):
 		guestbook_name = request.POST.get('guestbook_name')
-		dict = {'guestbook_name': guestbook_name, 'author': users.get_current_user(), 'content': request.POST.get('content')}
+		dict = {
+			'guestbook_name': guestbook_name,
+			'author': users.get_current_user(),
+			'content': request.POST.get('content')
+		}
 		Greeting.put_from_dict(dict)
 		context = HttpResponseRedirect(
 			'/?' + urllib.urlencode({'guestbook_name': guestbook_name}))

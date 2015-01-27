@@ -19,6 +19,10 @@ class Greeting(ndb.Model):
 	def get_lastest(cls, guestbook_name, count=10, force_new=False):
 		if(not force_new):
 			greetings = memcache.get('%s:greetings' % guestbook_name)
+			if greetings is not None:
+				return greetings
+			else:
+				greetings = cls._query_update_memcache(guestbook_name, count)
 		else:
 			greetings = cls._query_update_memcache(guestbook_name, count)
 		return greetings
