@@ -1,6 +1,7 @@
 import logging
 from google.appengine.ext import ndb
 from google.appengine.api import memcache
+from google.appengine.api import users
 
 DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
 
@@ -27,20 +28,22 @@ class Greeting(ndb.Model):
 	def get_lastest(cls, guestbook_name, count=10, force_new=False):
 		if(not force_new):
 			greetings = memcache.get('%s:greetings' % guestbook_name)
-			if greetings is not None:
-				return greetings
-			else:
-				cls.prefix_query_update_memcache(guestbook_name, count)
+			logging.warning(greetings)
 		else:
-			cls.prefix_query_update_memcache(guestbook_name, count)
+			greetings = cls._query_update_memcache(guestbook_name, count)
 		return greetings
 
 	@classmethod
-	def prefix_query_update_memcache(self, guestbook_name, count):
-		greetings_query = Greeting.query(ancestor=ndb.Key(Greeting, guestbook_name)).order(
-			-Greeting.date)
+	def _query_update_memcache(cls, guestbook_name, count):
+		greetings_query = cls.query(ancestor=ndb.Key(cls, guestbook_name)).order(
+			-cls.date)
 		greetings = greetings_query.fetch(count)
 		if not memcache.set('%s:greetings' % guestbook_name, greetings, count):
 			logging.error('Memcache set failed.')
+		return greetings
 
-
+	def put_from_dict(greeting, content):
+		if users.get_current_user():
+			greeting.author = users.get_current_user()
+		greeting.content = content
+		greeting.put()
