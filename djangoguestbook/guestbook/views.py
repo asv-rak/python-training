@@ -1,13 +1,30 @@
 import urllib
-from django.views.generic.base import TemplateView
-from django.http import HttpResponseRedirect
+from django.views.generic.edit import FormView
 from google.appengine.api import users
 from guestbook.models import Greeting, DEFAULT_GUESTBOOK_NAME
+from guestbook.forms import PostForm
 
 
-class GreetingView(TemplateView):
+class GreetingView(FormView):
 	template_name = "guestbook/main_page.html"
 	force_new = False
+	form_class = PostForm
+
+	def form_valid(self, form):
+		guestbook_name = form.cleaned_data.get('guestbook_name')
+		dict = {
+			'guestbook_name': guestbook_name,
+			'author': users.get_current_user(),
+			'content': form.cleaned_data.get('content')
+		}
+		Greeting.put_from_dict(dict)
+		self.success_url = '/?' + urllib.urlencode({'guestbook_name': guestbook_name})
+		self.__class__.set_force_new(True)
+		return super(GreetingView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		self.success_url = '/'
+		return super(GreetingView, self).form_valid(form)
 
 	def get_context_data(self, **kwargs):
 		guestbook_name = self.request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
@@ -26,19 +43,6 @@ class GreetingView(TemplateView):
 			'url_linktext': url_linktext,
 		}
 		context = template_values
-		return context
-
-	def post(self, request):
-		guestbook_name = request.POST.get('guestbook_name')
-		dict = {
-			'guestbook_name': guestbook_name,
-			'author': users.get_current_user(),
-			'content': request.POST.get('content')
-		}
-		Greeting.put_from_dict(dict)
-		context = HttpResponseRedirect(
-			'/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
-		self.__class__.set_force_new(True)
 		return context
 
 	@classmethod
