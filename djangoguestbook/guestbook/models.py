@@ -1,7 +1,6 @@
 import logging
 from google.appengine.ext import ndb
 from google.appengine.api import memcache
-from google.appengine.api import users
 
 DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
 
@@ -17,33 +16,33 @@ class Greeting(ndb.Model):
 	date = ndb.DateTimeProperty(auto_now_add=True)
 
 	@classmethod
-	def creat_greeting(cls, guestbook_name):
-		return Greeting(parent=Greeting.get_guestbook_key(guestbook_name))
-
-	@classmethod
-	def get_guestbook_key(cls, guestbook_name=DEFAULT_GUESTBOOK_NAME):
-		return ndb.Key(cls, guestbook_name)
-
-	@classmethod
 	def get_lastest(cls, guestbook_name, count=10, force_new=False):
 		if(not force_new):
 			greetings = memcache.get('%s:greetings' % guestbook_name)
-			logging.warning(greetings)
 		else:
 			greetings = cls._query_update_memcache(guestbook_name, count)
 		return greetings
 
 	@classmethod
 	def _query_update_memcache(cls, guestbook_name, count):
-		greetings_query = cls.query(ancestor=ndb.Key(cls, guestbook_name)).order(
+		greetings_query = cls.query(ancestor=ndb.Key(Guestbook, guestbook_name)).order(
 			-cls.date)
 		greetings = greetings_query.fetch(count)
 		if not memcache.set('%s:greetings' % guestbook_name, greetings, count):
 			logging.error('Memcache set failed.')
 		return greetings
 
-	def put_from_dict(greeting, content):
-		if users.get_current_user():
-			greeting.author = users.get_current_user()
-		greeting.content = content
+	@classmethod
+	def put_from_dict(cls, dict):
+		greeting = Greeting(parent=Guestbook.get_key(dict['guestbook_name']))
+		if dict['author']:
+			greeting.author = dict['author']
+		greeting.content = dict['content']
 		greeting.put()
+
+
+class Guestbook(ndb.Model):
+	@classmethod
+	def get_key(cls, guestbook_name=DEFAULT_GUESTBOOK_NAME):
+		return ndb.Key(cls, guestbook_name)
+

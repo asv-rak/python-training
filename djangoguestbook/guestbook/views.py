@@ -12,7 +12,7 @@ class GreetingView(TemplateView):
 	def get_context_data(self, **kwargs):
 		guestbook_name = self.request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
 		greetings = Greeting.get_lastest(guestbook_name, 10, self.force_new)
-		self.set_force_new(False)
+		self.__class__.set_force_new(False)
 		if users.get_current_user():
 			url = users.create_logout_url(self.request.get_full_path())
 			url_linktext = 'Logout'
@@ -30,10 +30,11 @@ class GreetingView(TemplateView):
 
 	def post(self, request):
 		guestbook_name = request.POST.get('guestbook_name')
-		Greeting.put_from_dict(Greeting.creat_greeting(guestbook_name), request.POST.get('content'))
+		dict = {'guestbook_name': guestbook_name, 'author': users.get_current_user(), 'content': request.POST.get('content')}
+		Greeting.put_from_dict(dict)
 		context = HttpResponseRedirect(
 			'/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
-		self.set_force_new(True)
+		self.__class__.set_force_new(True)
 		return context
 
 	@classmethod
