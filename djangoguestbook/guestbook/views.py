@@ -1,6 +1,10 @@
 import urllib
+from django.core.mail import send_mail
 from django.views.generic.edit import FormView
 from google.appengine.api import users
+from google.appengine.api.taskqueue import taskqueue
+from google.appengine.ext import ndb
+import webapp2
 from guestbook.models import Greeting, DEFAULT_GUESTBOOK_NAME
 from guestbook.forms import PostForm
 
@@ -20,10 +24,24 @@ class GreetingView(FormView):
 		Greeting.put_from_dict(dict)
 		self.success_url = '/?' + urllib.urlencode({'guestbook_name': guestbook_name})
 		self.__class__.set_force_new(True)
-		return super(GreetingView, self).form_valid(form)
 
-	def form_invalid(self, form):
-		return super(GreetingView, self).form_invalid(form)
+		taskqueue.add(
+			url='/mail',
+			params={
+				'subject': dict['guestbook_name'],
+				'body': dict['content'],
+				'sendfrom': dict['author'],
+				'sendto': 'phamtangtung@gmail.com',
+				}
+		)
+		# send_mail(
+		# 	dict['guestbook_name'],
+		# 	dict['content'],
+		# 	dict['author'],
+		# 	'phamtangtung@gmail.com'
+		# )
+
+		return super(GreetingView, self).form_valid(form)
 
 	def get_context_data(self, **kwargs):
 		guestbook_name = self.request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
@@ -50,11 +68,22 @@ class GreetingView(FormView):
 		cls.force_new = _force_new
 
 
+class MailWorker(webapp2.RequestHandler):
+	def post(self):
+		subject = self.request.get('subject')
+		body = self.request.get('body')
+		sendfrom = self.request.get('sendfrom')
+		sendto = self.request.get('sendto')
 
-
-
-
-
+		@ndb.transactional
+		def send():
+			send_mail(
+				subject,
+				body,
+				sendfrom,
+				[sendto]
+			)
+		send()
 
 
 
