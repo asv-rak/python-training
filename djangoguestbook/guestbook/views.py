@@ -23,8 +23,7 @@ class GreetingView(FormView):
 		return super(GreetingView, self).form_valid(form)
 
 	def form_invalid(self, form):
-		self.success_url = '/'
-		return super(GreetingView, self).form_valid(form)
+		return super(GreetingView, self).form_invalid(form)
 
 	def get_context_data(self, **kwargs):
 		guestbook_name = self.request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
@@ -41,6 +40,7 @@ class GreetingView(FormView):
 			'guestbook_name': guestbook_name,
 			'url': url,
 			'url_linktext': url_linktext,
+			'form': kwargs['form']
 		}
 		context = template_values
 		return context
