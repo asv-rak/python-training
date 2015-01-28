@@ -1,10 +1,15 @@
+import logging
 import urllib
-from django.core.mail import send_mail
+from django.http import HttpResponse
+from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from google.appengine.api import users
-from google.appengine.api.taskqueue import taskqueue
+from google.appengine.api.mail import send_mail
+try:
+	from google.appengine.api.labs import taskqueue
+except:
+	from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
-import webapp2
 from guestbook.models import Greeting, DEFAULT_GUESTBOOK_NAME
 from guestbook.forms import PostForm
 
@@ -24,23 +29,17 @@ class GreetingView(FormView):
 		Greeting.put_from_dict(dict)
 		self.success_url = '/?' + urllib.urlencode({'guestbook_name': guestbook_name})
 		self.__class__.set_force_new(True)
-
+		logging.warning(dict['content'])
 		taskqueue.add(
 			url='/mail',
+			method='GET',
 			params={
 				'subject': dict['guestbook_name'],
 				'body': dict['content'],
-				'sendfrom': dict['author'],
-				'sendto': 'phamtangtung@gmail.com',
+				'sender': dict['author'],
+				'receiver': 'phamtangtung@gmail.com',
 				}
 		)
-		# send_mail(
-		# 	dict['guestbook_name'],
-		# 	dict['content'],
-		# 	dict['author'],
-		# 	'phamtangtung@gmail.com'
-		# )
-
 		return super(GreetingView, self).form_valid(form)
 
 	def get_context_data(self, **kwargs):
@@ -68,23 +67,17 @@ class GreetingView(FormView):
 		cls.force_new = _force_new
 
 
-class MailWorker(webapp2.RequestHandler):
-	def post(self):
-		subject = self.request.get('subject')
-		body = self.request.get('body')
-		sendfrom = self.request.get('sendfrom')
-		sendto = self.request.get('sendto')
+class MailWorker(TemplateView):
 
-		@ndb.transactional
-		def send():
-			send_mail(
-				subject,
-				body,
-				sendfrom,
-				[sendto]
-			)
-		send()
-
+	@ndb.transactional
+	def get(self, request, *args, **kwargs):
+		send_mail(
+			self.request.GET.get('sender'),
+			self.request.GET.get('receiver'),
+			self.request.GET.get('subject'),
+			self.request.GET.get('body')
+		)
+		return HttpResponse("Done")
 
 
 
