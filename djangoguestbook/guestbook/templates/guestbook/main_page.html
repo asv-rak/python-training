@@ -10,8 +10,14 @@
 				An anonymous person wrote:
 			{% endif %}
 			<blockquote>{{ greeting.content|escape }}</blockquote>
+			{% if is_admin %}
+				<form action="/delete/" method="delete">
+					<input type="hidden" value={{greeting.key.id|escape}} name="greeting_id">
+					<input type="submit" value="Delete" method="delete">
+				</form>
+			{% endif %}
+			<br>
 		{% endfor %}
-
 		<form action="/sign/" method="post">
 			{% csrf_token %}
 			{{ form.as_p }}
