@@ -1,19 +1,19 @@
 import urllib
 from django.views.generic.edit import FormView, HttpResponseRedirect
 from guestbook.models import Greeting, DEFAULT_GUESTBOOK_NAME
-from guestbook.forms import PostForm
+from guestbook.forms import PostForm, DeleteForm
 from google.appengine.api import users
 from django import forms
 
 
 class DeleteGreetingView(FormView):
 	template_name = "guestbook/main_page.html"
-	form_class = forms.Form
+	form_class = DeleteForm
 
-	def get(self, request, *args, **kwargs):
-		delete_id = self.request.GET.get('greeting_id')
-		guestbook_name = self.request.GET.get('guestbook_name')
-		Greeting.delete_greeting(guestbook_name, int(delete_id))
+	def form_valid(self, form):
+		greeting_id = form.cleaned_data.get('greeting_id')
+		guestbook_name = form.cleaned_data.get('guestbook_name')
+		Greeting.delete_greeting(guestbook_name, int(greeting_id))
 		return HttpResponseRedirect('/')
 
 

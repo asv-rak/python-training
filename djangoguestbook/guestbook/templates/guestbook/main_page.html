@@ -11,10 +11,11 @@
 			{% endif %}
 			<blockquote>{{ greeting.content|escape }}</blockquote>
 			{% if is_admin %}
-				<form action="/delete/" method="delete">
+				<form action="/delete/" method="post">
+					{% csrf_token %}
 					<input type="hidden" value={{guestbook_name}} name="guestbook_name">
 					<input type="hidden" value={{greeting.key.id|escape}} name="greeting_id">
-					<input type="submit" value="Delete" method="delete">
+					<input type="submit" value="Delete">
 				</form>
 			{% endif %}
 			<br>

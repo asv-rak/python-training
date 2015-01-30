@@ -28,8 +28,8 @@ class Greeting(ndb.Model):
 		return greetings
 
 	@classmethod
-	def delete_greeting(cls, guestbook_name, delete_id):
-		ndb.Key(Guestbook, guestbook_name, cls, int(delete_id)).delete()
+	def delete_greeting(cls, guestbook_name, greeting_id):
+		ndb.Key(Guestbook, guestbook_name, cls, int(greeting_id)).delete()
 		cls._query_update_memcache(guestbook_name, 10)
 
 	@classmethod
