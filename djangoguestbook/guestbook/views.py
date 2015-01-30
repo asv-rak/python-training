@@ -1,4 +1,3 @@
-import logging
 import urllib
 from django.http import HttpResponse
 from django.views.generic import TemplateView
@@ -29,7 +28,6 @@ class GreetingView(FormView):
 		Greeting.put_from_dict(dict)
 		self.success_url = '/?' + urllib.urlencode({'guestbook_name': guestbook_name})
 		self.__class__.set_force_new(True)
-		logging.warning(dict['content'])
 		taskqueue.add(
 			url='/mail',
 			method='GET',
@@ -67,7 +65,7 @@ class GreetingView(FormView):
 		cls.force_new = _force_new
 
 
-class MailWorker(TemplateView):
+class MailView(TemplateView):
 
 	@ndb.transactional
 	def get(self, request, *args, **kwargs):
