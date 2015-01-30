@@ -48,8 +48,8 @@ class Greeting(ndb.Model):
 		greeting.put()
 
 	@classmethod
-	def edit_greeting(cls, edit_id, dict):
-		key = ndb.Key(Guestbook, dict['guestbook_name'], Greeting, int(edit_id))
+	def edit_greeting(cls, dict):
+		key = ndb.Key(Guestbook, dict['guestbook_name'], cls, int(dict['greeting_id']))
 		greeting = key.get()
 		greeting.content = dict['content']
 		greeting.updateby = dict['update_by']
