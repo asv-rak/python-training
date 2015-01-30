@@ -12,6 +12,7 @@
 			<blockquote>{{ greeting.content|escape }}</blockquote>
 			{% if is_admin %}
 				<form action="/delete/" method="delete">
+					<input type="hidden" value={{guestbook_name}} name="guestbook_name">
 					<input type="hidden" value={{greeting.key.id|escape}} name="greeting_id">
 					<input type="submit" value="Delete" method="delete">
 				</form>
@@ -23,7 +24,6 @@
 			{{ form.as_p }}
 			<div><input type="submit" value="Sign Guestbook"></div>
 		</form>
-
 		<a href="{{ url }}">{{ url_linktext }}</a>
 	</body>
 </html>

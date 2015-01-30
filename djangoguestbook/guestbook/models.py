@@ -28,8 +28,8 @@ class Greeting(ndb.Model):
 		return greetings
 
 	@classmethod
-	def delete_greeting(cls, delete_id):
-		ndb.Key(Guestbook, int(delete_id)).delete()
+	def delete_greeting(cls, guestbook_name, delete_id):
+		ndb.Key(Guestbook, guestbook_name, Greeting, int(delete_id)).delete()
 
 	@classmethod
 	def _query_update_memcache(cls, guestbook_name, count):
@@ -52,6 +52,5 @@ class Greeting(ndb.Model):
 class Guestbook(ndb.Model):
 	@classmethod
 	def get_key(cls, guestbook_name=DEFAULT_GUESTBOOK_NAME):
-		logging.warning(ndb.Key)
 		return ndb.Key(cls, guestbook_name)
 

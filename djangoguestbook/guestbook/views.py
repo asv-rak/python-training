@@ -1,8 +1,39 @@
 import urllib
 from django.views.generic.edit import FormView
-from google.appengine.api import users
-from guestbook.models import Greeting, DEFAULT_GUESTBOOK_NAME
+from guestbook.models import Greeting, DEFAULT_GUESTBOOK_NAME, Guestbook
 from guestbook.forms import PostForm
+from google.appengine.api import users
+
+
+class DeleteGreetingView(FormView):
+	template_name = "guestbook/main_page.html"
+	form_class = PostForm
+
+	def get_context_data(self, **kwargs):
+		delete_id = self.request.GET.get('greeting_id')
+		guestbook_name = self.request.GET.get('guestbook_name')
+		Greeting.delete_greeting(guestbook_name, int(delete_id))
+		greetings = Greeting.get_lastest(guestbook_name, 10, True)
+		if users.get_current_user():
+			url = users.create_logout_url(self.request.get_full_path())
+			url_linktext = 'Logout'
+		else:
+			url = users.create_login_url(self.request.get_full_path())
+			url_linktext = 'Login'
+		if users.is_current_user_admin():
+			admin = True
+		else:
+			admin = False
+		template_values = {
+			'greetings': greetings,
+			'guestbook_name': guestbook_name,
+			'url': url,
+			'url_linktext': url_linktext,
+			'form': kwargs['form'],
+			'is_admin': admin,
+		}
+		context = template_values
+		return context
 
 
 class GreetingView(FormView):
@@ -35,12 +66,17 @@ class GreetingView(FormView):
 		else:
 			url = users.create_login_url(self.request.get_full_path())
 			url_linktext = 'Login'
+		if users.is_current_user_admin():
+			admin = True
+		else:
+			admin = False
 		template_values = {
 			'greetings': greetings,
 			'guestbook_name': guestbook_name,
 			'url': url,
 			'url_linktext': url_linktext,
-			'form': kwargs['form']
+			'form': kwargs['form'],
+			'is_admin': admin
 		}
 		context = template_values
 		return context
@@ -48,18 +84,6 @@ class GreetingView(FormView):
 	@classmethod
 	def set_force_new(cls, _force_new):
 		cls.force_new = _force_new
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
