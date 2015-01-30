@@ -29,7 +29,8 @@ class Greeting(ndb.Model):
 
 	@classmethod
 	def delete_greeting(cls, guestbook_name, delete_id):
-		ndb.Key(Guestbook, guestbook_name, Greeting, int(delete_id)).delete()
+		ndb.Key(Guestbook, guestbook_name, cls, int(delete_id)).delete()
+		cls._query_update_memcache(guestbook_name, 10)
 
 	@classmethod
 	def _query_update_memcache(cls, guestbook_name, count):
