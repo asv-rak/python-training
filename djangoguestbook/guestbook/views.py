@@ -12,7 +12,6 @@ class EditGreetingView(FormView):
 	guestbook_name = DEFAULT_GUESTBOOK_NAME
 
 	def form_valid(self, form):
-
 		dict = {
 			'greeting_id': self.__class__.greeting_id,
 			'guestbook_name': self.__class__.guestbook_name,
@@ -65,12 +64,10 @@ class GreetingView(FormView):
 		else:
 			url = users.create_login_url(self.request.get_full_path())
 			url_linktext = 'Login'
-
 		if users.is_current_user_admin():
 			admin = True
 		else:
 			admin = False
-
 		user = users.get_current_user()
 		template_values = {
 			'greetings': greetings,
