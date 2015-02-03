@@ -1,4 +1,5 @@
 import logging
+import datetime
 from google.appengine.ext import ndb
 from google.appengine.api import memcache
 
@@ -14,6 +15,8 @@ class Greeting(ndb.Model):
 	author = ndb.UserProperty()
 	content = ndb.StringProperty(indexed=False)
 	date = ndb.DateTimeProperty(auto_now_add=True)
+	updateby = ndb.UserProperty()
+	updatedate = ndb.DateTimeProperty(auto_now_add=False)
 
 	@classmethod
 	def get_lastest(cls, guestbook_name, count=10, force_new=False):
@@ -43,6 +46,16 @@ class Greeting(ndb.Model):
 			greeting.author = dict['author']
 		greeting.content = dict['content']
 		greeting.put()
+
+	@classmethod
+	def update_from_dict(cls, dict):
+		key = ndb.Key(Guestbook, dict['guestbook_name'], cls, int(dict['greeting_id']))
+		greeting = key.get()
+		greeting.content = dict['content']
+		greeting.updateby = dict['update_by']
+		greeting.updatedate = datetime.datetime.now()
+		greeting.put()
+		cls._query_update_memcache(dict['guestbook_name'], 10)
 
 
 class Guestbook(ndb.Model):

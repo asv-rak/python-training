@@ -10,6 +10,20 @@
 				An anonymous person wrote:
 			{% endif %}
 			<blockquote>{{ greeting.content|escape }}</blockquote>
+
+			{% if greeting.updateby.nickname %}
+				<blockquote>Updated by:  {{ greeting.updateby|escape}}</blockquote>
+				<blockquote>Updated date:  {{ greeting.updatedate|escape}}</blockquote>
+			{% endif %}
+
+			{% if is_admin or greeting.author.nickname and greeting.author == current_user %}
+				<form action="/edit/" method="put">
+					<blockquote></blockquote>
+					<div><input type="submit" value="Edit message"></div>
+					<div><input type="hidden" value={{ greeting.key.id|escape }} name ="greeting_id"></div>
+					<div><input type="hidden" value={{ guestbook_name }} name ="guestbook_name"></div>
+				</form>
+			{% endif %}
 		{% endfor %}
 
 		<form action="/sign/" method="post">
