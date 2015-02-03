@@ -1,4 +1,5 @@
 import urllib
+from django import forms
 from django.views.generic.edit import FormView
 from google.appengine.api import users
 from guestbook.models import Greeting, DEFAULT_GUESTBOOK_NAME
@@ -25,6 +26,7 @@ class EditGreetingView(FormView):
 		greeting_id = long(self.request.GET.get('greeting_id', 0))
 		guestbook_name = self.request.GET.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
 		kwargs['form'] = EditForm(initial={'guestbook_name': guestbook_name, 'greeting_id': greeting_id})
+		kwargs['form'].fields['greeting_id'].widget = forms.HiddenInput()
 		template_values = {
 			'form': kwargs['form'],
 		}
