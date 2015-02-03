@@ -14,7 +14,8 @@ class DeleteGreetingView(FormView):
 		greeting_id = form.cleaned_data.get('greeting_id')
 		guestbook_name = form.cleaned_data.get('guestbook_name')
 		Greeting.delete_greeting(guestbook_name, int(greeting_id))
-		return HttpResponseRedirect('/')
+		self.success_url = '/?' + urllib.urlencode({'guestbook_name': guestbook_name})
+		return super(DeleteGreetingView, self).form_valid(form)
 
 
 class GreetingView(FormView):
