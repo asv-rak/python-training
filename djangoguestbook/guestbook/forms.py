@@ -8,5 +8,3 @@ class PostForm(forms.Form):
 
 class EditForm(forms.Form):
 	content = forms.CharField(widget=forms.Textarea, max_length=10)
-	greeting_id = forms.IntegerField()
-	guestbook_name = forms.CharField()
