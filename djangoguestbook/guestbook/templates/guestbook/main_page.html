@@ -20,8 +20,8 @@
 				<form action="/edit/" method="put">
 					<blockquote></blockquote>
 					<div><input type="submit" value="Edit message"></div>
-					<div><input type="hidden" value={{ greeting.key.id|escape }} name ="edited_message"></div>
-					<div><input type="hidden" value={{ guestbook_name }} name ="old_guestbook_name"></div>
+					<div><input type="hidden" value={{ greeting.key.id|escape }} name ="greeting_id"></div>
+					<div><input type="hidden" value={{ guestbook_name }} name ="guestbook_name"></div>
 				</form>
 			{% endif %}
 		{% endfor %}

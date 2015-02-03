@@ -5,12 +5,13 @@
 	<title></title>
 </head>
 <body>
-	<form action="/edited/" method="post">
+	<div><input type="hidden" value={{ greeting_id }} name="greeting_id"></div>
+	<div><input type="hidden" value={{ guestbook_name }} name="guestbook_name"></div>
+	<b>Edit greeting: </b>
+	<form action="/edit/" method="post">
 		{% csrf_token %}
 		{{ form }}
 		<div><input type="submit" value="Submit"></div>
-		<div><input type="hidden" value={{ greeting_id }} name="greeting_id"></div>
-		<div><input type="hidden" value={{ guestbook_name }} name="guestbook_name"></div>
 	</form>
 </body>
 </html>
