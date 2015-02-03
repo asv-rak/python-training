@@ -12,14 +12,16 @@ class EditGreetingView(FormView):
 	form_class = EditForm
 
 	def form_valid(self, form):
+		guestbook_name = form.cleaned_data.get('guestbook_name')
 		dict = {
 			'greeting_id': form.cleaned_data.get('greeting_id'),
-			'guestbook_name': form.cleaned_data.get('guestbook_name'),
+			'guestbook_name': guestbook_name,
 			'update_by': users.get_current_user(),
 			'content': form.cleaned_data.get('content'),
 		}
-		Greeting.edit_greeting(dict)
-		return HttpResponseRedirect('/')
+		Greeting.update_from_dict(dict)
+		self.success_url = '/?' + urllib.urlencode({'guestbook_name': guestbook_name})
+		return super(EditGreetingView, self).form_valid(form)
 
 
 class GreetingView(FormView):
