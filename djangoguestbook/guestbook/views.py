@@ -59,8 +59,3 @@ class GreetingView(FormView):
 
 
 
-
-
-
-
-

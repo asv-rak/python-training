@@ -1,6 +1,8 @@
 import logging
+import datetime
 from google.appengine.ext import ndb
 from google.appengine.api import memcache
+from google.appengine.datastore.datastore_query import Cursor
 
 DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
 
@@ -43,6 +45,39 @@ class Greeting(ndb.Model):
 			greeting.author = dict['author']
 		greeting.content = dict['content']
 		greeting.put()
+		return greeting
+
+	@classmethod
+	def update_from_dict(cls, dict):
+		greeting = cls.get_greeting_by_id(dict['guestbook_name'],dict['greeting_id'])
+		greeting.content = dict['content']
+		greeting.updateby = dict['update_by']
+		greeting.updatedate = datetime.datetime.now()
+		greeting.put()
+		cls._query_update_memcache(dict['guestbook_name'], 10)
+		return greeting
+
+	@classmethod
+	def get_greeting_by_id(cls, guestbook_name, greeting_id):
+		key = ndb.Key(Guestbook, guestbook_name, cls, int(greeting_id))
+		greeting = key.get()
+		return greeting
+
+	@classmethod
+	def delete_greeting_by_id(cls,guestbook_name, greeting_id):
+		try:
+			id = int(greeting_id)
+		except ValueError:
+			return False
+		if int(id) > 0:
+			key = ndb.Key(Guestbook, guestbook_name, cls, int(greeting_id))
+			if key:
+				greeting = key.get()
+				if greeting:
+					key.delete()
+					memcache.delete('%s:greetings' % guestbook_name)
+					return True
+		return False
 
 
 class Guestbook(ndb.Model):
@@ -50,3 +85,19 @@ class Guestbook(ndb.Model):
 	def get_key(cls, guestbook_name=DEFAULT_GUESTBOOK_NAME):
 		return ndb.Key(cls, guestbook_name)
 
+	@classmethod
+	def get_greeting(cls, guestbook_name=DEFAULT_GUESTBOOK_NAME, num_greetings=20, str_cursor=None):
+		if num_greetings <= 0:
+			greetings = None
+			next_cursor = None
+			more = None
+		try:
+			guestbook_key = cls.get_key(guestbook_name)
+			cursor = Cursor(urlsafe=str_cursor)
+			greetings, next_cursor, more = Greeting.query(ancestor=guestbook_key).order(-Greeting.date)\
+				.fetch_page(num_greetings, start_cursor=cursor)
+		except:
+			greetings = None
+			next_cursor = None
+			more = None
+		return greetings, next_cursor, more
