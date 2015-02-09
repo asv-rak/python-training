@@ -16,6 +16,8 @@ class Greeting(ndb.Model):
 	author = ndb.UserProperty()
 	content = ndb.StringProperty(indexed=False)
 	date = ndb.DateTimeProperty(auto_now_add=True)
+	updated_by = ndb.UserProperty()
+	updated_date = ndb.DateTimeProperty(auto_now_add=True)
 
 	@classmethod
 	def get_lastest(cls, guestbook_name, count=10, force_new=False):
@@ -49,10 +51,10 @@ class Greeting(ndb.Model):
 
 	@classmethod
 	def update_from_dict(cls, dict):
-		greeting = cls.get_greeting_by_id(dict['guestbook_name'],dict['greeting_id'])
+		greeting = cls.get_greeting_by_id(dict['guestbook_name'], dict['greeting_id'])
 		greeting.content = dict['content']
-		greeting.updateby = dict['update_by']
-		greeting.updatedate = datetime.datetime.now()
+		greeting.update_by = dict['update_by']
+		greeting.update_date = datetime.datetime.now()
 		greeting.put()
 		cls._query_update_memcache(dict['guestbook_name'], 10)
 		return greeting
@@ -78,6 +80,25 @@ class Greeting(ndb.Model):
 					memcache.delete('%s:greetings' % guestbook_name)
 					return True
 		return False
+
+	def to_dict(self, include=None, exclude=None):
+		dict = {
+			"id": self.key.id(),
+			"content": self.content,
+			"date": self.date.strftime("%Y-%m-%d %H:%M +0000"),
+			"updated_by": self.updated_by
+		}
+		if self.author:
+			dict['author'] = self.author
+		else:
+			dict['author'] = "Anonymous"
+
+		if self.updated_date:
+			dict['updated_date'] = self.updated_date.strftime("%Y-%m-%d %H:%M +0000")
+		else:
+			dict['updated_date'] = None
+
+		return dict
 
 
 class Guestbook(ndb.Model):
