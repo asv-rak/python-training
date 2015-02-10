@@ -5,8 +5,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeletionMixin
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.api import users
-from guestbook.forms import PostForm, APIEditGreetingForm
-from guestbook.models import DEFAULT_GUESTBOOK_NAME, Guestbook, Greeting
+from guestbook.forms import PostForm, EditGreetingForm
+from guestbook.models import DEFAULT_GUESTBOOK_NAME, Greeting
 
 
 class JSONResponseMixin(object):
@@ -38,7 +38,7 @@ class APIGreeting(JSONResponseMixin, FormView):
 	def get_context_data(self, **kwargs):
 		guestbook_name = self.kwargs.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
 		str_cursor = self.request.GET.get('cursor', None)
-		greetings, next_cursor, next = Guestbook.get_greeting(guestbook_name, 20, str_cursor)
+		greetings, next_cursor, next = Greeting.get_greeting(guestbook_name, 20, str_cursor)
 		greetings_dict = [greeting.to_dict() for greeting in greetings]
 		data = {}
 		data['greeting'] = greetings_dict
@@ -66,7 +66,7 @@ class APIGreeting(JSONResponseMixin, FormView):
 
 class APIDetailGreeting(JSONResponseMixin, DetailView, FormView, DeletionMixin):
 	object = Greeting
-	form_class = APIEditGreetingForm
+	form_class = EditGreetingForm
 	success_url = "/"
 
 	def get_object(self, queryset=None):
@@ -80,10 +80,9 @@ class APIDetailGreeting(JSONResponseMixin, DetailView, FormView, DeletionMixin):
 
 	def get_context_data(self, **kwargs):
 		if self.object:
-			data = self.object.to_dict()
+			return self.object.to_dict()
 		else:
-			data = {"error": "wrong greeting id"}
-		return data
+			return HttpResponse(status=404)
 
 	def put(self, request, *args, **kwargs):
 		request.POST = json.loads(request.body)
@@ -97,13 +96,24 @@ class APIDetailGreeting(JSONResponseMixin, DetailView, FormView, DeletionMixin):
 	def form_valid(self, form):
 		greeting_id = self.kwargs.get('greeting_id', -1)
 		guestbook_name = self.kwargs.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
-		if form.update_greeting(guestbook_name, greeting_id):
+		if users.get_current_user():
+			greeting_updated_by = users.get_current_user().nickname()
+		else:
+			greeting_updated_by = None
+		dict = {
+			'greeting_id': greeting_id,
+			'guestbook_name': guestbook_name,
+			'update_by': greeting_updated_by,
+			'content': form.cleaned_data['greeting_content'],
+		}
+		new_greeting = Greeting.update_from_dict(dict)
+		if new_greeting:
 			return HttpResponse(status=204)
 		else:
 			return HttpResponse(status=404)
 
 	def form_invalid(self, form):
-		return HttpResponse(status=404)
+		return HttpResponse(status=400)
 
 	def delete(self, request, *args, **kwargs):
 		greeting_id = self.kwargs.get('greeting_id', -1)
