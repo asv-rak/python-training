@@ -85,9 +85,6 @@ class APIDetailGreeting(JSONResponseMixin, DetailView, FormView, DeletionMixin):
 			data = {"error": "wrong greeting id"}
 		return data
 
-	def post(self, request, *args, **kwargs):
-		return HttpResponse(status=404)
-
 	def put(self, request, *args, **kwargs):
 		request.POST = json.loads(request.body)
 		form_class = self.get_form_class()
