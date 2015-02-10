@@ -29,7 +29,11 @@ class APIGreeting(JSONResponseMixin, FormView):
 			Cursor(urlsafe=self.request.GET.get('cursor'))
 		except:
 			return HttpResponse(status=404)
-		return super(APIGreeting,self).get(self, request, *args, **kwargs)
+		return super(APIGreeting, self).get(self, request, *args, **kwargs)
+
+	def post(self, request, *args, **kwargs):
+		request.POST = json.loads(request.body)
+		return super(APIGreeting, self).post(self, request, *args, **kwargs)
 
 	def get_context_data(self, **kwargs):
 		guestbook_name = self.kwargs.get('guestbook_name', DEFAULT_GUESTBOOK_NAME)
@@ -84,7 +88,8 @@ class APIDetailGreeting(JSONResponseMixin, DetailView, FormView, DeletionMixin):
 	def post(self, request, *args, **kwargs):
 		return HttpResponse(status=404)
 
-	def put(self, *args, **kwargs):
+	def put(self, request, *args, **kwargs):
+		request.POST = json.loads(request.body)
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 		if form.is_valid():

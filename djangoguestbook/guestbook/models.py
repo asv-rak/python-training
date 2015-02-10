@@ -13,10 +13,10 @@ DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
 
 class Greeting(ndb.Model):
 	'''Models an individual Guestbook entry.'''
-	author = ndb.UserProperty()
+	author = ndb.StringProperty()
 	content = ndb.StringProperty(indexed=False)
 	date = ndb.DateTimeProperty(auto_now_add=True)
-	updated_by = ndb.UserProperty()
+	updated_by = ndb.StringProperty()
 	updated_date = ndb.DateTimeProperty(auto_now_add=True)
 
 	@classmethod
@@ -44,7 +44,9 @@ class Greeting(ndb.Model):
 	def put_from_dict(cls, dict):
 		greeting = Greeting(parent=Guestbook.get_key(dict['guestbook_name']))
 		if dict['author']:
-			greeting.author = dict['author']
+			greeting.author = dict['author'].nickname()
+		else:
+			greeting.author = None
 		greeting.content = dict['content']
 		greeting.put()
 		return greeting

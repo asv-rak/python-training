@@ -66,7 +66,7 @@ class APIEditGreetingForm(forms.Form):
 			'greeting_id': greeting_id,
 			'guestbook_name': guestbook_name,
 			'update_by': greeting_updated_by,
-			'content': self.cleaned_data['greeting_content'],
+			'content': greeting_content,
 		}
 		new_greeting = Greeting.update_from_dict(dict)
 		return new_greeting
