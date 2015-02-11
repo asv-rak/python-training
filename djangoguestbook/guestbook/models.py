@@ -43,10 +43,7 @@ class Greeting(ndb.Model):
 	@classmethod
 	def put_from_dict(cls, dict):
 		greeting = Greeting(parent=Guestbook.get_key(dict['guestbook_name']))
-		if dict['author']:
-			greeting.author = dict['author'].nickname()
-		else:
-			greeting.author = None
+		greeting.author = dict['author']
 		greeting.content = dict['content']
 		greeting.put()
 		return greeting
@@ -56,8 +53,8 @@ class Greeting(ndb.Model):
 		greeting = cls.get_greeting_by_id(dict['guestbook_name'], dict['greeting_id'])
 		if greeting:
 			greeting.content = dict['content']
-			greeting.update_by = dict['update_by']
-			greeting.update_date = datetime.datetime.now()
+			greeting.updated_by = dict['update_by']
+			greeting.updated_date = datetime.datetime.now()
 			greeting.put()
 			cls._query_update_memcache(dict['guestbook_name'], 10)
 		return greeting
@@ -100,7 +97,6 @@ class Greeting(ndb.Model):
 			dict['updated_date'] = self.updated_date.strftime("%Y-%m-%d %H:%M +0000")
 		else:
 			dict['updated_date'] = None
-
 		return dict
 
 	@classmethod
