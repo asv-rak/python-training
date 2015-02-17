@@ -46,7 +46,7 @@ class Greeting(ndb.Model):
 		if dict['author']:
 			greeting.author = dict['author'].nickname()
 		else:
-			greeting.author = None
+			greeting.author = "Anomynous"
 		greeting.content = dict['content']
 		greeting.put()
 		return greeting

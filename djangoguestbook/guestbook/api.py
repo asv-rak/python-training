@@ -1,4 +1,5 @@
 import json
+import logging
 from django.http import HttpResponse
 from django.views.generic import FormView
 from django.views.generic.detail import DetailView
@@ -45,6 +46,8 @@ class APIGreeting(JSONResponseMixin, FormView):
 		if next_cursor:
 			data['cursor'] = next_cursor.urlsafe()
 		data['next'] = next
+		logging.warning("get context data")
+		logging.warning(data)
 		return data
 
 	def form_valid(self, form):

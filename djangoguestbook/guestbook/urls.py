@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from guestbook.views import GreetingView
+from guestbook.views import GreetingView, DojoGuestbook
 from guestbook.api import APIGreeting, APIDetailGreeting
 urlpatterns = patterns(
 	'',
@@ -14,4 +14,5 @@ urlpatterns = patterns(
 		r'^api/guestbook/(?P<guestbook_name>(.)+)/greeting/(?P<greeting_id>(.)+)$',
 		APIDetailGreeting.as_view(),
 		name="detail-greeting"),
+    url(r'^dojo/$', DojoGuestbook.as_view())
 )
