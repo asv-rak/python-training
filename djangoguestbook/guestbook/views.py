@@ -52,25 +52,25 @@ class GreetingView(FormView):
 
 
 class DojoGuestbook(TemplateView):
-    template_name = "guestbook/dojo_guestbook.html"
+	template_name = "guestbook/dojo_guestbook.html"
 
-    def get_context_data(self, **kwargs):
-        context = super(DojoGuestbook, self).get_context_data(**kwargs)
+	def get_context_data(self, **kwargs):
+		context = super(DojoGuestbook, self).get_context_data(**kwargs)
 
-        # create login/logout url
-        if users.get_current_user():
-            url = users.create_logout_url(self.request.get_full_path())
-            url_linktext = 'Logout'
-            context['user_login'] = users.get_current_user().nickname()
-            context['is_user_admin'] = users.is_current_user_admin()
-        else:
-            url = users.create_login_url(self.request.get_full_path())
-            url_linktext = 'Login'
+		# create login/logout url
+		if users.get_current_user():
+			url = users.create_logout_url(self.request.get_full_path())
+			url_linktext = 'Logout'
+			context['user_login'] = users.get_current_user().nickname()
+			context['is_user_admin'] = users.is_current_user_admin()
+		else:
+			url = users.create_login_url(self.request.get_full_path())
+			url_linktext = 'Login'
 
-        context['url'] = url
-        context['url_linktext'] = url_linktext
+		context['url'] = url
+		context['url_linktext'] = url_linktext
 
-        return context
+		return context
 
 
 

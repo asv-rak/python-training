@@ -14,5 +14,5 @@ urlpatterns = patterns(
 		r'^api/guestbook/(?P<guestbook_name>(.)+)/greeting/(?P<greeting_id>(.)+)$',
 		APIDetailGreeting.as_view(),
 		name="detail-greeting"),
-    url(r'^dojo/$', DojoGuestbook.as_view())
+	url(r'^dojo/$', DojoGuestbook.as_view())
 )

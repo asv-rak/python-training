@@ -42,7 +42,7 @@ class APIGreeting(JSONResponseMixin, FormView):
 		greetings, next_cursor, next = Greeting.get_greeting(guestbook_name, 20, str_cursor)
 		greetings_dict = [greeting.to_dict() for greeting in greetings]
 		data = {}
-		data['greeting'] = greetings_dict
+		data['greetings'] = greetings_dict
 		if next_cursor:
 			data['cursor'] = next_cursor.urlsafe()
 		data['next'] = next

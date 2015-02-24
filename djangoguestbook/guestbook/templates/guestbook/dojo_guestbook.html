@@ -16,7 +16,7 @@
             parseOnLoad : true,
             packages: [{
                 name: "myGuestbook",
-                location: "/static/js/guestbook"
+                location: "/static/js/guestbook/views"
             }]
         };
     })();
@@ -27,7 +27,7 @@
     require([
         "dojo/parser",
         "dojo/_base/config",
-        "myGuestbook/views/GuestbookView",
+        "myGuestbook/GuestbookView",
         "dojo/domReady!"
     ], function(parser, config){
         if (!config.parseOnLoad) {
