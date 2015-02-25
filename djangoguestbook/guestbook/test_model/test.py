@@ -1,7 +1,9 @@
 from unittest import TestCase
 from datetime import datetime
+
 from google.appengine.ext import testbed
 from google.appengine.ext import ndb
+
 from guestbook.models import Greeting, Guestbook, DEFAULT_GUESTBOOK_NAME
 
 
@@ -111,13 +113,7 @@ class TestGreeting(TestBaseClass):
 		assert got_greeting is not None and got_greeting == greeting
 
 	def test_get_greeting_with_wrong_id(self):
-		dict = {
-			'guestbook_name': self.guestbook_name,
-			'author': "test_author",
-			'content': "testing"
-		}
-		greeting = Greeting.put_from_dict(dict)
-		got_greeting = Greeting.get_greeting_by_id(self.guestbook_name, greeting.key.id()+1)
+		got_greeting = Greeting.get_greeting_by_id(self.guestbook_name, 999)
 		assert got_greeting is None
 
 	def test_delete_greeting_wiht_right_id(self):
@@ -131,7 +127,7 @@ class TestGreeting(TestBaseClass):
 		got_greeting = Greeting.get_greeting_by_id(self.guestbook_name, greeting.key.id())
 		assert got_greeting is None
 
-	def test_delete_greeting_wiht_right_id(self):
+	def test_delete_greeting_wiht_wrong_id(self):
 		dict = {
 			'guestbook_name': self.guestbook_name,
 			'author': "test_author",
@@ -150,15 +146,13 @@ class TestGreeting(TestBaseClass):
 		greeting.updated_by = "updated_author"
 		greeting.updated_date = datetime.strptime('2015-02-11 13:00 +0000', "%Y-%m-%d %H:%M +0000")
 		greeting.put()
-		test_dict = {
-			'id': greeting.key.id(),
-			'author': 'test_author',
-			'content': "testing",
-			'date': "2015-02-11 13:00 +0000",
-			'updated_by': "updated_author",
-			'updated_date': "2015-02-11 07:11 +0000"
-		}
-		assert test_dict == greeting.to_dict()
+		dict = greeting.to_dict()
+		assert dict['id'] == greeting.key.id() and\
+			dict['author'] == "test_author" and\
+			dict['content'] == "testing" and\
+			dict['date'] == "2015-02-11 13:00 +0000" and\
+			dict['updated_by'] == "updated_author" and\
+			dict['updated_date'] == "2015-02-11 13:00 +0000"
 
 	def test_to_dict_with_wrong_id(self):
 		greeting = Greeting()
@@ -168,15 +162,8 @@ class TestGreeting(TestBaseClass):
 		greeting.updated_by = "updated_author"
 		greeting.updated_date = datetime.strptime('2015-02-11 13:00 +0000', "%Y-%m-%d %H:%M +0000")
 		greeting.put()
-		test_dict = {
-			'id': greeting.key.id() + 1,
-			'author': 'test_author',
-			'content': "testing",
-			'date': "2015-02-11 13:00 +0000",
-			'updated_by': "updated_author",
-			'updated_date': "2015-02-11 07:11 +0000"
-		}
-		assert test_dict != greeting.to_dict()
+		dict = greeting.to_dict()
+		assert dict['id'] != greeting.key.id() + 1
 
 	def test_to_dict_with_wrong_some_data(self):
 		greeting = Greeting()
@@ -186,42 +173,59 @@ class TestGreeting(TestBaseClass):
 		greeting.updated_by = "updated_author"
 		greeting.updated_date = datetime.strptime('2015-02-11 13:00 +0000', "%Y-%m-%d %H:%M +0000")
 		greeting.put()
-		test_dict = {
-			'id': greeting.key.id(),
-			'author': 'test_author',
-			'content': "testing",
-			'date': "2015-02-11 13:00 +0000",
-			'updated_by': "update_author",  # wrong updated author
-			'updated_date': "2015-02-11 07:11 +0000"
-		}
-		assert test_dict != greeting.to_dict()
+		dict = greeting.to_dict()
+		assert dict != "update_author"
 
 	def test_get_greeting_with_no_cursor_in_of_size(self):
-		greetings, next_cursor, next = Greeting.get_greeting(self.guestbook_name, 10, None)
-		assert greetings is not None and next_cursor is not None and next is True
+		total_count = len(Greeting.query(ancestor=ndb.Key(Guestbook, self.guestbook_name)).order(
+			-Greeting.date).fetch())
+		num_greetings = 10
+		greetings, next_cursor, more = Greeting.get_greeting(self.guestbook_name, num_greetings, None)
+		assert \
+			greetings is not None and\
+			next_cursor is not None and \
+			more is (num_greetings < total_count)
 
 	def test_get_greeting_with_no_cursor_out_of_size(self):
-		greetings, next_cursor, next = Greeting.get_greeting(self.guestbook_name, 21, None)
-		assert greetings is not None and next_cursor is not None and next is False
+		total_count = len(Greeting.query(ancestor=ndb.Key(Guestbook, self.guestbook_name)).order(
+			-Greeting.date).fetch())
+		num_greetings = 21
+		greetings, next_cursor, more = Greeting.get_greeting(self.guestbook_name, num_greetings, None)
+		assert \
+			greetings is not None and\
+			next_cursor is not None and\
+			more is (num_greetings < total_count)
 
 	def test_get_greeting_with_right_cursor_in_of_size(self):
+		total_count = len(Greeting.query(ancestor=ndb.Key(Guestbook, self.guestbook_name)).order(
+			-Greeting.date).fetch())
+		num_greetings = 10
 		greetings_tmp, nextcurs_tmp, more_tmp = Greeting.get_greeting(self.guestbook_name, 1, None)
-		greetings, next_cursor, next = Greeting.get_greeting(
+		greetings, next_cursor, more = Greeting.get_greeting(
 			self.guestbook_name,
-			10,
+			num_greetings,
 			nextcurs_tmp.urlsafe())
-		assert greetings is not None and next_cursor is not None and next is True
+		assert \
+			greetings is not None and \
+			next_cursor is not None and \
+			more is (num_greetings < total_count)
 
 	def test_get_greeting_with_right_cursor_out_of_size(self):
+		total_count = len(Greeting.query(ancestor=ndb.Key(Guestbook, self.guestbook_name)).order(
+			-Greeting.date).fetch())
+		num_greetings = 21
 		greetings_tmp, nextcurs_tmp, more_tmp = Greeting.get_greeting(self.guestbook_name, 1, None)
-		greetings, next_cursor, next = Greeting.get_greeting(
+		greetings, next_cursor, more = Greeting.get_greeting(
 			self.guestbook_name,
-			21,
+			num_greetings,
 			nextcurs_tmp.urlsafe())
-		assert greetings is not None and next_cursor is not None and next is False
+		assert \
+			greetings is not None and \
+			next_cursor is not None and \
+			more is (num_greetings < total_count)
 
 	def test_get_greeting_with_wrong_cursor(self):
-		greetings, next_cursor, next = Greeting.get_greeting(self.guestbook_name, 21, "worng cursor")
+		greetings, next_cursor, more = Greeting.get_greeting(self.guestbook_name, 21, "worng cursor")
 		assert greetings is None and next_cursor is None
 
 
