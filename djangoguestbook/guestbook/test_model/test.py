@@ -1,9 +1,8 @@
 from unittest import TestCase
 from datetime import datetime
-
 from google.appengine.ext import testbed
 from google.appengine.ext import ndb
-
+from mock import patch
 from guestbook.models import Greeting, Guestbook, DEFAULT_GUESTBOOK_NAME
 
 
@@ -33,21 +32,61 @@ class TestBaseClass(TestCase):
 
 class TestGreeting(TestBaseClass):
 
-	def test_get_lastest_with_correct_guestbook_name(self):
-		greetings = Greeting.get_lastest(self.guestbook_name, 10, False)
-		assert greetings is not None and len(greetings) == 10
+	def test_get_lastest_with_correct_guestbook_name_non_cache(self):
+		with patch('google.appengine.api.memcache.get') as func:
+			val_return = None
+			func.return_value = val_return
+			greetings = Greeting.get_lastest(self.guestbook_name, 10, False)
+			assert greetings is not None and len(greetings) == 10
 
-	def test_get_lastest_with_wrong_guestbook_name(self):
-		greetings = Greeting.get_lastest("wrong_guestbook", 10, False)
-		assert greetings is not None and len(greetings) == 0
+	def test_get_lastest_with_correct_guestbook_name_have_cache(self):
+		with patch('google.appengine.api.memcache.get') as func:
+			val_return = Greeting._query_update_memcache(self.guestbook_name, 10)
+			func.return_value = val_return
+			greetings = Greeting.get_lastest(self.guestbook_name, 10, False)
+			assert greetings is not None and len(greetings) == 10
 
-	def test_get_lastest_with_out_of_size(self):
-		greetings = Greeting.get_lastest(self.guestbook_name, 30, False)
-		assert greetings is not None and len(greetings) == 20
+	def test_get_lastest_with_wrong_guestbook_name_non_cache(self):
+		with patch('google.appengine.api.memcache.get') as func:
+			val_return = None
+			func.return_value = val_return
+			greetings = Greeting.get_lastest("wrong_guestbook", 10, False)
+			assert greetings is not None and len(greetings) == 0
 
-	def test_get_lastest_with_in_of_size(self):
-		greetings = Greeting.get_lastest(self.guestbook_name, 5, False)
-		assert greetings is not None and len(greetings) == 5
+	def test_get_lastest_with_wrong_guestbook_name_have_cache(self):
+		with patch('google.appengine.api.memcache.get') as func:
+			val_return = Greeting._query_update_memcache(self.guestbook_name, 10)
+			func.return_value = val_return
+			greetings = Greeting.get_lastest("wrong_guestbook", 10, False)
+			assert greetings is not None and len(greetings) == 0
+
+	def test_get_lastest_with_out_of_size_non_cache(self):
+		with patch('google.appengine.api.memcache.get') as func:
+			val_return = None
+			func.return_value = val_return
+			greetings = Greeting.get_lastest(self.guestbook_name, 30, False)
+			assert greetings is not None and len(greetings) == 20
+
+	def test_get_lastest_with_out_of_size_have_cache(self):
+		with patch('google.appengine.api.memcache.get') as func:
+			val_return = Greeting._query_update_memcache(self.guestbook_name, 30)
+			func.return_value = val_return
+			greetings = Greeting.get_lastest(self.guestbook_name, 30, False)
+			assert greetings is not None and len(greetings) == 20
+
+	def test_get_lastest_with_in_of_size_non_cache(self):
+		with patch('google.appengine.api.memcache.get') as func:
+			val_return = None
+			func.return_value = val_return
+			greetings = Greeting.get_lastest(self.guestbook_name, 5, False)
+			assert greetings is not None and len(greetings) == 5
+
+	def test_get_lastest_with_in_of_size_have_cache(self):
+		with patch('google.appengine.api.memcache.get') as func:
+			val_return = Greeting._query_update_memcache(self.guestbook_name, 5)
+			func.return_value = val_return
+			greetings = Greeting.get_lastest(self.guestbook_name, 5, False)
+			assert greetings is not None and len(greetings) == 5
 
 	def test__query_update_memcache(self):
 		greetings = Greeting._query_update_memcache(self.guestbook_name, 10)
