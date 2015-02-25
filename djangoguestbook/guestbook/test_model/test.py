@@ -2,6 +2,7 @@ from unittest import TestCase
 from datetime import datetime
 from google.appengine.ext import testbed
 from google.appengine.ext import ndb
+from google.appengine.api import memcache
 from mock import patch
 from guestbook.models import Greeting, Guestbook, DEFAULT_GUESTBOOK_NAME
 
@@ -90,7 +91,9 @@ class TestGreeting(TestBaseClass):
 
 	def test__query_update_memcache(self):
 		greetings = Greeting._query_update_memcache(self.guestbook_name, 10)
-		assert greetings is not None and len(greetings) == 10
+		# check update memcache
+		greetings_memcache = memcache.get('%s:greetings' % self.guestbook_name)
+		assert greetings is not None and len(greetings) == 10 and greetings_memcache == greetings
 
 	def test_put_from_dict(self):
 		dict = {
