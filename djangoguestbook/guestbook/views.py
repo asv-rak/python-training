@@ -12,9 +12,13 @@ class GreetingView(FormView):
 
 	def form_valid(self, form):
 		guestbook_name = form.cleaned_data.get('guestbook_name')
+		if users.get_current_user():
+			author = users.get_current_user().nickname()
+		else:
+			author = None
 		dict = {
 			'guestbook_name': guestbook_name,
-			'author': users.get_current_user(),
+			'author': author,
 			'content': form.cleaned_data.get('content')
 		}
 		Greeting.put_from_dict(dict)
@@ -48,11 +52,6 @@ class GreetingView(FormView):
 	@classmethod
 	def set_force_new(cls, _force_new):
 		cls.force_new = _force_new
-
-
-
-
-
 
 
 
