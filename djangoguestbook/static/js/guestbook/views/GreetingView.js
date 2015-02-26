@@ -6,15 +6,15 @@ define([
 	"dojo/dom-style",
 	"dojo/mouse",
 	"dojo/on",
+	"dojo/text!./templates/GreetingView.html",
 	"dijit/_WidgetBase",
 	"dijit/_TemplatedMixin",
 	"dijit/_WidgetsInTemplateMixin",
 	"dijit/InlineEditBox",
-	"dojo/text!./templates/GreetingView.html",
-	"/static/js/guestbook/views/models/GreetingStore.js"
-], function(declare, baseFx, lang, dom, domStyle, mouse, on,
+	"/static/js/guestbook/models/GreetingStore.js"
+], function(declare, baseFx, lang, dom, domStyle, mouse, on, template,
 			_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-			InlineEditBox, template, GreetingStore){
+			InlineEditBox, GreetingStore){
 	return declare("guestbook.GreetingView", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 		id_greeting: 0,
 		author: "Anonymous",
@@ -60,9 +60,9 @@ define([
 				on(domNode, mouse.leave, lang.hitch(this, "_changeBackground", this.baseBackgroundColor, domNode)),
 
 				// handle button Delete
-				on(this.deleteButtonNode, "click", lang.hitch(this, "_onclickDeleteBtn"))
+				on(this.deleteButtonNode, "click", lang.hitch(this, "_onclickDeleteBtn")),
 				// button save in InLineEditText
-				,on(this.contentNode, "change", lang.hitch(this, "_onclickSaveBtn"))
+				on(this.contentNode, "change", lang.hitch(this, "_onclickSaveBtn"))
 			);
 
 			this.GreetingStore = new GreetingStore();
@@ -93,15 +93,14 @@ define([
 			var guestbookParent = this.GuestbookViewParent;
 			var guestbookName = this.guestbookName;
 			var greetingId = this.greetingIdNode.value;
-			var deleteGreetingDeferred = this.GreetingStore.deleteGreeting(guestbookName, greetingId);
-			deleteGreetingDeferred.then(function(results){
-					guestbookParent.reloadListGreeting(guestbookName);
-				},
-				function(err){
-					console.log(err.message);
-				}, function(progress){
-					console.log(progress);
-				})
+			var deleteGreeting = this.GreetingStore.deleteGreeting(guestbookName, greetingId);
+			deleteGreeting.then(function(results){
+				guestbookParent.removeGreeting(greetingId);
+			}, 	function(err){
+				console.log(err.message);
+			}, 	function(progress){
+				console.log(progress);
+			})
 		},
 
 		_onclickSaveBtn: function(){
@@ -114,7 +113,7 @@ define([
 			if (contentLength > 0 && contentLength <= 10){
 				var _updateGreetingDeferred = this.GreetingStore.updateGreeting(guestbookName, greetingId, greetingContent);
 				_updateGreetingDeferred.then(function(results){
-					_guestbookParent.reloadListGreeting(guestbookName);
+					//_guestbookParent.reloadListGreeting(guestbookName);
 				},function(err){
 					console.log(err.message);
 					alert(err.message);
@@ -124,21 +123,25 @@ define([
 			} else {
 				alert("Error: This content is empty or length > 10 chars")
 			}
-		}
-		, setHiddenDeleteNode:function(hidden){
+		},
+
+		setHiddenDeleteNode:function(hidden){
 			if (hidden){
 				domStyle.set(this.deleteButtonNode.domNode, 'visibility', 'hidden');
 			} else {
 				domStyle.set(this.deleteButtonNode.domNode, 'visibility', 'visible');
 			}
-		}
-		, setDisabledEditor: function(disabled){
+		},
+
+		setDisabledEditor: function(disabled){
 			this.contentNode._setDisabledAttr(disabled);
-		}
-		, setGuestbookName: function(guestbookName){
+		},
+
+		setGuestbookName: function(guestbookName){
 			this.guestbookName = guestbookName;
-		}
-		, setGuestbookParent:function(guestbookParent){
+		},
+
+		setGuestbookParent:function(guestbookParent){
 			this.GuestbookViewParent = guestbookParent;
 		}
 	});

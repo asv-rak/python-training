@@ -89,16 +89,7 @@ define([
 		// get list greeting
 		getListGreeting: function(guestbookName){
 			this.set('guestbookName', guestbookName);
-
-			var deferred = new Deferred();
-
-			this.store.query().then(function(results){
-				deferred.resolve(results);
-			},function(error){
-				console.log("The server error: ", error.message);
-				deferred.reject(error);
-			});
-			return deferred.promise;
+			return this.store.query()
 		}
 	})
 });

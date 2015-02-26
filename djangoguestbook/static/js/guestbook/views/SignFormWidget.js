@@ -4,15 +4,15 @@ define([
 	"dojo/_base/lang",
 	"dojo/dom-style",
 	"dojo/on",
+	"dojo/text!./templates/SignFormWidget.html",
 	"dijit/_WidgetBase",
 	"dijit/_TemplatedMixin",
 	"dijit/_WidgetsInTemplateMixin",
 	"dijit/form/ValidationTextBox",
 	"dijit/form/Button",
-	"dojo/text!./templates/SignFormWidget.html",
-	"/static/js/guestbook/views/models/GreetingStore.js"
-], function(declare, baseFx, lang, domStyle, on, _WidgetBase,
-			_TemplatedMixin, _WidgetsInTemplateMixin, ValidationTextBox, Button, template, GreetingStore){
+	"/static/js/guestbook/models/GreetingStore.js"
+], function(declare, baseFx, lang, domStyle, on, template, _WidgetBase,
+			_TemplatedMixin, _WidgetsInTemplateMixin, ValidationTextBox, Button, GreetingStore){
 	return declare("guestbook.SignFormWidget", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin ], {
 		// Our template - important!
 		templateString: template,
@@ -37,8 +37,7 @@ define([
 
 		_signNewGreeting: function(guestbookView, guestbookName, greetingContent){
 			var _contentLength = greetingContent.length;
-			if (_contentLength > 0 && _contentLength <= 10){
-				var _createGreetingDeferred = this.GreetingStore.createGreeting(guestbookName, greetingContent);
+			var _createGreetingDeferred = this.GreetingStore.createGreeting(guestbookName, greetingContent);
 				_createGreetingDeferred.then(function(results){
 					guestbookView.reloadListGreeting(guestbookName);
 				},function(err){
@@ -46,9 +45,6 @@ define([
 				}, function(progress){
 					console.log(progress);
 				})
-			} else {
-				alert("Error: This content is empty or length > 10 chars");
-			}
 		},
 
 		_setGuestbookNameAttr: function(guestbookName){
@@ -56,3 +52,4 @@ define([
 		}
 	});
 });
+

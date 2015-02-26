@@ -1,21 +1,26 @@
 define([
 	"dojo/_base/declare",
 	"dojo/_base/lang",
-	"dijit/_WidgetBase",
-	"dijit/_TemplatedMixin",
-	"dijit/_WidgetsInTemplateMixin",
+	"dojo/_base/array",
+	"dojo/_base/config",
+	"dojo/query",
 	"dojo/request",
 	"dojo/on",
 	"dojo/dom",
 	"dojo/dom-construct",
-	"dojo/_base/array",
+	"dojo/text!./templates/GuestbookView.html",
+	"dijit",
+	"dijit/registry",
+	"dijit/_WidgetBase",
+	"dijit/_TemplatedMixin",
+	"dijit/_WidgetsInTemplateMixin",
 	"/static/js/guestbook/views/GreetingView.js",
 	"/static/js/guestbook/views/SignFormWidget.js",
-	"/static/js/guestbook/views/models/GreetingStore.js",
-	"dojo/text!./templates/GuestbookView.html"
-], function(declare, lang, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-			request, on, dom, domConstruct, arrayUtil, GreetingView, SignFormWidget,
-			GreetingStore, template){
+	"/static/js/guestbook/models/GreetingStore.js"
+], function(declare, lang, arrayUtil, config, query, request, on, dom, domConstruct, template, dijit,
+			registry, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
+			GreetingView, SignFormWidget,
+			GreetingStore){
 	return declare("guestbook.GuestbookView", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 		// Our template - important!
 		templateString: template,
@@ -48,32 +53,19 @@ define([
 		},
 
 		_showListGreeting: function(guestbookName){
-			var isAdmin = "false";
-			var isUserAdminNode = dom.byId("is_user_admin");
-			if (isUserAdminNode){
-				isAdmin = isUserAdminNode.value;
-			}
-
-			var userLogin = "false";
-			var userLoginNode = dom.byId("user_login");
-			if (userLoginNode){
-				userLogin = userLoginNode.value;
-			}
-
 			var guestbookWidgetParent = this;
-
 			var _greetingList = this.GreetingStore.getListGreeting(guestbookName);
 			_greetingList.then(function(results){
 				var _newDocFrag = document.createDocumentFragment();
 				arrayUtil.forEach(results.greetings, function(greeting){
 					var greetingView = new GreetingView(greeting);
 					// show button delete for admin
-					if (isAdmin.toLowerCase() == "true"){
+					if (config.isAdmin){
 						greetingView.setHiddenDeleteNode(false);
 						greetingView.setDisabledEditor(false);
 					}
 					// show button edit if author written
-					if (userLogin == greeting.author){
+					if (config.userLogin == greeting.author){
 						greetingView.setDisabledEditor(false);
 					}
 					// set guestbook name
@@ -89,8 +81,6 @@ define([
 			});
 		},
 
-
-
 		_onclickSwitchBtn: function(){
 			var guestbookNameLength = this.guestbookNameNode.value;
 			if (guestbookNameLength > 0 && guestbookNameLength <= 20){
@@ -102,15 +92,24 @@ define([
 			}
 		},
 
+		removeGreeting: function(greetingID){
+			var widget = registry.byId(greetingID);
+			widget.destroy()
+		},
+
 		_removeAllGreeting: function(){
-			this.greetingsContainerNode.innerHTML = "";
+			var dom = query(".greetingView");
+			for(var i=0; i<dom.length; i++)
+			{
+				this.removeGreeting(dom[i].id);
+			}
 		},
 
 		_setGuestbookNameAttr: function(guestbookName){
 			this.guestbookNameNode.set("value", guestbookName);
 		},
 
-		reloadListGreeting:function(guestbookName){
+		reloadListGreeting:function(guestbookName, greetingID){
 			this._removeAllGreeting();
 			this._showListGreeting(guestbookName);
 		}

@@ -1,44 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dojo guestbook</title>
-    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/dojo/1.9.1/dijit/themes/claro/claro.css" />
+	<title>Dojo guestbook</title>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/dojo/1.9.1/dijit/themes/claro/claro.css" />
 </head>
 <body>
 <h1>Guestbook</h1>
 <div id="greetingContainer"></div>
 <!-- Configure Dojo -->
 <script>
-    var dojoConfig = (function(){
-        return {
-            async: true,
-            isDebug: true,
-            parseOnLoad : true,
-            packages: [{
-                name: "myGuestbook",
-                location: "/static/js/guestbook/views"
-            }]
-        };
-    })();
+	var dojoConfig = (function(){
+		return {
+			async: true,
+			isDebug: true,
+			parseOnLoad : true,
+			packages: [{
+				name: "myGuestbook",
+				location: "/static/js/guestbook/views"
+			}],
+			isAdmin: {% if is_user_admin %} true {% else %} false {% endif %},
+			userLogin: "{{ user_login }}"
+		};
+	})();
 </script>
 <div data-dojo-type="guestbook.GuestbookView"></div>
 <script src="//ajax.googleapis.com/ajax/libs/dojo/1.10.0/dojo/dojo.js"></script>
 <script type="text/javascript">
-    require([
-        "dojo/parser",
-        "dojo/_base/config",
-        "myGuestbook/GuestbookView",
-        "dojo/domReady!"
-    ], function(parser, config){
-        if (!config.parseOnLoad) {
-            parser.parse();
-        }
-    });
-</script>
-<br>
-<input id="is_user_admin" value="{{ is_user_admin }}" type="hidden"/>
-<input id="user_login" value="{{ user_login }}" type="hidden"/>
-<br>
+	require([
+		"dojo/parser",
+		"dojo/_base/config",
+		"myGuestbook/GuestbookView",
+		"dojo/domReady!"
+	], function(parser, config){
+		if (!config.parseOnLoad) {
+			parser.parse();
+		}
+	})
+	</script>
+
 <br>
 <a href="{{ url }}">{{ url_linktext }}</a>
 </body>
