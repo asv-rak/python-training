@@ -4,15 +4,15 @@ define([
 	"dojo/_base/lang",
 	"dojo/dom-style",
 	"dojo/on",
-	"dojo/text!./templates/SignFormWidget.html",
 	"dijit/_WidgetBase",
 	"dijit/_TemplatedMixin",
 	"dijit/_WidgetsInTemplateMixin",
 	"dijit/form/ValidationTextBox",
 	"dijit/form/Button",
-	"/static/js/guestbook/models/GreetingStore.js"
-], function(declare, baseFx, lang, domStyle, on, template, _WidgetBase,
-			_TemplatedMixin, _WidgetsInTemplateMixin, ValidationTextBox, Button, GreetingStore){
+	"../models/GreetingStore",
+	"dojo/text!./templates/SignFormWidget.html"
+], function(declare, baseFx, lang, domStyle, on,_WidgetBase, _TemplatedMixin,
+			_WidgetsInTemplateMixin, ValidationTextBox, Button, GreetingStore,  template){
 	return declare("guestbook.SignFormWidget", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin ], {
 		// Our template - important!
 		templateString: template,

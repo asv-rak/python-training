@@ -8,15 +8,14 @@ define([
 	"dojo/on",
 	"dojo/dom",
 	"dojo/dom-construct",
-	"dojo/text!./templates/GuestbookView.html",
-	"dijit",
 	"dijit/registry",
 	"./_ViewBaseMixin",
-	"/static/js/guestbook/views/GreetingView.js",
-	"/static/js/guestbook/views/SignFormWidget.js",
-	"/static/js/guestbook/models/GreetingStore.js"
-], function(declare, lang, arrayUtil, config, query, request, on, dom, domConstruct, template, dijit,
-			registry, _ViewBaseMixin, GreetingView, SignFormWidget,GreetingStore){
+	"./GreetingView",
+	"./SignFormWidget",
+	"../models/GreetingStore",
+	"dojo/text!./templates/GuestbookView.html"
+], function(declare, lang, arrayUtil, config, query, request, on, dom, domConstruct,
+			registry, _ViewBaseMixin, GreetingView, SignFormWidget,GreetingStore,  template){
 	return declare("guestbook.GuestbookView", [_ViewBaseMixin], {
 		// Our template - important!
 		templateString: template,
@@ -79,13 +78,9 @@ define([
 
 		_onclickSwitchBtn: function(){
 			var guestbookNameLength = this.guestbookNameNode.value;
-			if (guestbookNameLength > 0 && guestbookNameLength <= 20){
-				this.reloadListGreeting(this.guestbookNameNode.value);
+			this.reloadListGreeting(this.guestbookNameNode.value);
 				// set guestbook name for Sign form
-				this.signFormWidget._setGuestbookNameAttr(this.guestbookNameNode.value);
-			} else {
-				alert("Error: Guestbook name is empty or length > 20 chars")
-			}
+			this.signFormWidget._setGuestbookNameAttr(this.guestbookNameNode.value);
 		},
 
 		removeGreeting: function(greetingID){
@@ -105,7 +100,7 @@ define([
 			this.guestbookNameNode.set("value", guestbookName);
 		},
 
-		reloadListGreeting:function(guestbookName, greetingID){
+		reloadListGreeting:function(guestbookName){
 			this._removeAllGreeting();
 			this._showListGreeting(guestbookName);
 		}

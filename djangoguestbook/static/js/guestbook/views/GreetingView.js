@@ -6,16 +6,13 @@ define([
 	"dojo/dom-style",
 	"dojo/mouse",
 	"dojo/on",
-	"dojo/text!./templates/GreetingView.html",
-	"dijit/_WidgetBase",
-	"dijit/_TemplatedMixin",
-	"dijit/_WidgetsInTemplateMixin",
+	"./_ViewBaseMixin",
 	"dijit/InlineEditBox",
-	"/static/js/guestbook/models/GreetingStore.js"
-], function(declare, baseFx, lang, dom, domStyle, mouse, on, template,
-			_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-			InlineEditBox, GreetingStore){
-	return declare("guestbook.GreetingView", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+	"../models/GreetingStore",
+	"dojo/text!./templates/GreetingView.html"
+], function(declare, baseFx, lang, dom, domStyle, mouse, on,
+			_ViewBaseMixin, InlineEditBox, GreetingStore, template){
+	return declare("guestbook.GreetingView", [_ViewBaseMixin], {
 		id_greeting: 0,
 		author: "Anonymous",
 		date: "",
@@ -110,8 +107,7 @@ define([
 			var greetingId = this.greetingIdNode.value;
 
 			var contentLength = greetingContent.length;
-			if (contentLength > 0 && contentLength <= 10){
-				var _updateGreetingDeferred = this.GreetingStore.updateGreeting(guestbookName, greetingId, greetingContent);
+			var _updateGreetingDeferred = this.GreetingStore.updateGreeting(guestbookName, greetingId, greetingContent);
 				_updateGreetingDeferred.then(function(results){
 					//_guestbookParent.reloadListGreeting(guestbookName);
 				},function(err){
@@ -120,9 +116,6 @@ define([
 				}, function(progress){
 					console.log(progress);
 				})
-			} else {
-				alert("Error: This content is empty or length > 10 chars")
-			}
 		},
 
 		setHiddenDeleteNode:function(hidden){

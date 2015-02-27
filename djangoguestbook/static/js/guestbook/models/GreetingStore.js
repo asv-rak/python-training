@@ -33,9 +33,7 @@ define([
 
 			var deferred = new Deferred();
 			var contentLength = greetingContent.length;
-			if (contentLength > 0 && contentLength <= 10){
-
-				this.store.add({
+			this.store.add({
 					guestbook_name: guestbookName,
 					content: greetingContent
 				}).then(function(results){
@@ -44,11 +42,6 @@ define([
 					console.log("The server error: ", error.message);
 					deferred.reject(error);
 				} );
-
-			} else {
-				var error = {message: "This content is empty or length > 10 char"};
-				deferred.reject(error);
-			}
 
 			return deferred.promise;
 		},
@@ -59,9 +52,7 @@ define([
 
 			var deferred = new Deferred();
 			var _contentLength = greetingContent.length;
-			if (_contentLength > 0 && _contentLength <= 10){
-
-				this.store.put({
+			this.store.put({
 					greeting_content: greetingContent
 				}, {
 					id: greetingId
@@ -72,12 +63,6 @@ define([
 					console.log("The server error: ", error.message);
 					deferred.reject(error);
 				});
-
-			} else {
-				var error = {message: "This content is empty or length > 10 char"};
-				deferred.reject(error);
-			}
-			return deferred.promise;
 		},
 
 		// Delete a greeting
