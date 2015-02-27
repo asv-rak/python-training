@@ -11,17 +11,13 @@ define([
 	"dojo/text!./templates/GuestbookView.html",
 	"dijit",
 	"dijit/registry",
-	"dijit/_WidgetBase",
-	"dijit/_TemplatedMixin",
-	"dijit/_WidgetsInTemplateMixin",
+	"./_ViewBaseMixin",
 	"/static/js/guestbook/views/GreetingView.js",
 	"/static/js/guestbook/views/SignFormWidget.js",
 	"/static/js/guestbook/models/GreetingStore.js"
 ], function(declare, lang, arrayUtil, config, query, request, on, dom, domConstruct, template, dijit,
-			registry, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin,
-			GreetingView, SignFormWidget,
-			GreetingStore){
-	return declare("guestbook.GuestbookView", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
+			registry, _ViewBaseMixin, GreetingView, SignFormWidget,GreetingStore){
+	return declare("guestbook.GuestbookView", [_ViewBaseMixin], {
 		// Our template - important!
 		templateString: template,
 		widgetsInTemplate: true,

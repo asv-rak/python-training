@@ -1,44 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Dojo guestbook</title>
-	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/dojo/1.9.1/dijit/themes/claro/claro.css" />
+    <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.0/dijit/themes/soria/soria.css" />
 </head>
 <body>
-<h1>Guestbook</h1>
-<div id="greetingContainer"></div>
-<!-- Configure Dojo -->
-<script>
-	var dojoConfig = (function(){
-		return {
-			async: true,
-			isDebug: true,
-			parseOnLoad : true,
-			packages: [{
-				name: "myGuestbook",
-				location: "/static/js/guestbook/views"
-			}],
+
+<script type="text/javascript">
+	{% autoescape off %}
+		var dojoConfig = {
+			baseUrl: '//ajax.googleapis.com/ajax/libs/dojo/1.10.0/dojo',
+			paths: {
+				'myGuestbook': '/static/js/guestbook'
+			},
 			isAdmin: {% if is_user_admin %} true {% else %} false {% endif %},
 			userLogin: "{{ user_login }}"
-		};
-	})();
+        };
+    {% endautoescape %}
 </script>
-<div data-dojo-type="guestbook.GuestbookView"></div>
-<script src="//ajax.googleapis.com/ajax/libs/dojo/1.10.0/dojo/dojo.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/dojo/1.10.0/dojo/dojo.js"></script>
 <script type="text/javascript">
-	require([
-		"dojo/parser",
-		"dojo/_base/config",
-		"myGuestbook/GuestbookView",
-		"dojo/domReady!"
-	], function(parser, config){
-		if (!config.parseOnLoad) {
-			parser.parse();
-		}
-	})
-	</script>
+    require(['myGuestbook/app']);
+</script>
 
-<br>
-<a href="{{ url }}">{{ url_linktext }}</a>
 </body>
 </html>
