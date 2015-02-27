@@ -1,9 +1,10 @@
 define([
 	'dojo/_base/declare',
+	'dojo/dom-class',
 	'dijit/_TemplatedMixin',
 	'dijit/_WidgetsInTemplateMixin',
     'dijit/_WidgetBase'
-], function(declare, _TemplatedMixin, _WidgetsInTemplateMixin, _WidgetBase) {
+], function(declare, domClass, _TemplatedMixin, _WidgetsInTemplateMixin, _WidgetBase) {
 
 	return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 		buildRendering: function() {
