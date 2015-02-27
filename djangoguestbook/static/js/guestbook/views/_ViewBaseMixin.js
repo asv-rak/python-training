@@ -15,7 +15,6 @@ define([
 			var parts = this.declaredClass.split('.'),
 				baseClass = parts[parts.length - 1];
 			baseClass = baseClass.substring(0, 1).toLowerCase() + baseClass.substring(1);
-			alert(baseClass),
 			domClass.add(this.domNode, baseClass);
 		}
 	});
