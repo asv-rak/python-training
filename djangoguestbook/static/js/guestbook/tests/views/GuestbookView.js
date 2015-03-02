@@ -28,7 +28,7 @@ define([
 		{
 			name: "Test_Load_Greeting_Container",
 			setUp: function(){
-				this.GreetingStore = new GreetingStore();
+				greetingStore = new GreetingStore();
 				var url = "/api/guestbook/default_guestbook/greeting/";
 				this.fakeSuccessData = {
 					"guestbook_name": this.guestbookName,
@@ -68,6 +68,4 @@ define([
 			timeout: 2000
 		}
 	])
-});/**
- * Created by fatatoopc on 3/2/15.
- */
+});

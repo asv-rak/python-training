@@ -9,11 +9,11 @@ define([
 		{
 			name: "Create_Greeting_Successful",
 			setUp: function(){
-				this.GreetingStore = new GreetingStore();
-				this.guestbookName = "test_guestbookname";
-				this.greetingContent = "";
+				greetingStore = new GreetingStore();
+				guestbookName = "test_guestbookname";
+				greetingContent = "";
 
-				var url = "/api/guestbook/" + this.guestbookName + "/greeting/";
+				var url = "/api/guestbook/" + guestbookName + "/greeting/";
 
 				this.fakeSuccessData = {
 					"data":"Successful data"
@@ -29,10 +29,10 @@ define([
 				])
 			},
 			runTest: function(){
-				var _dohDeferred = new doh.Deferred();
-				var _createGreetingDeferred = this.GreetingStore.createGreeting(this.guestbookName,
-					this.greetingContent);
-				_createGreetingDeferred.then(_dohDeferred.getTestCallback(function(results){
+				var dohDeferred = new doh.Deferred();
+				var createGreetingDeferred = greetingStore.createGreeting(guestbookName,
+					greetingContent);
+				createGreetingDeferred.then(dohDeferred.getTestCallback(function(results){
 					var expectation = {
 						"data":"Successful data"
 					};
@@ -40,23 +40,24 @@ define([
 				}));
 
 				this.fakeserver.respond();
-				return _dohDeferred;
+				return dohDeferred;
 			},
+
 			tearDown: function(){
-				this.GreetingStore = null;
-				this.guestbookName = null;
-				this.greetingContent = null;
+				reetingStore = null;
+				guestbookName = null;
+				greetingContent = null;
 				this.fakeserver.restore();
 			}
 		},
 		{
 			name: "Create_Greeting_Long_Content",
 			setUp: function(){
-				this.GreetingStore = new GreetingStore();
-				this.guestbookName = "test_guestbookname";
-				this.greetingContent = "test_greeting_long_content";
+				greetingStore = new GreetingStore();
+				guestbookName = "test_guestbookname";
+				greetingContent = "test_greeting_long_content";
 
-				var url = "/api/guestbook/" + this.guestbookName + "/greeting/";
+				var url = "/api/guestbook/" + guestbookName + "/greeting/";
 
 				this.fakeSuccessData = {
 				};
@@ -71,39 +72,40 @@ define([
 				])
 			},
 			runTest: function(){
-				var _dohDeferred = new doh.Deferred();
-				var _createGreetingDeferred = this.GreetingStore.createGreeting(this.guestbookName,
-					this.greetingContent);
-				_createGreetingDeferred.then(
-					_dohDeferred.getTestCallback(function(results){
+				var dohDeferred = new doh.Deferred();
+				var createGreetingDeferred = greetingStore.createGreeting(guestbookName,
+					greetingContent);
+				createGreetingDeferred.then(
+					dohDeferred.getTestCallback(function(results){
 					console.log("SUCCESS");
 					}),
-					_dohDeferred.getTestCallback(function(error){
+					dohDeferred.getTestCallback(function(error){
 					console.log("FAIL");
 					var message = error.message;
 					doh.assertEqual("This content is empty or length > 10 char", message);
 					})
 				);
+
 				this.fakeserver.respond();
-				return _dohDeferred;
+				return dohDeferred;
 			},
 			tearDown: function(){
-				this.GreetingStore = null;
-				this.guestbookName = null;
-				this.greetingContent = null;
+				greetingStore = null;
+				guestbookName = null;
+				greetingContent = null;
 				this.fakeserver.restore();
 			}
 		},
 		{
 			name: "GetListGreeting_Successful",
 			setUp: function(){
-				this.GreetingStore = new GreetingStore();
-				this.guestbookName = "test_guestbookname";
+				greetingStore = new GreetingStore();
+				guestbookName = "test_guestbookname";
 
-				var url = "/api/guestbook/" + this.guestbookName + "/greeting/";
+				var url = "/api/guestbook/" + guestbookName + "/greeting/";
 
 				this.fakeSuccessData = {
-					"guestbook_name": this.guestbookName,
+					"guestbook_name": guestbookName,
 					"greetings": [
 						{
 							"author" : "test_author",
@@ -127,12 +129,12 @@ define([
 				])
 			},
 			runTest: function(){
-				var _thisObject = this;
-				var _dohDeferred = new doh.Deferred();
-				var _getListGreetingDeferred = this.GreetingStore.getListGreeting(this.guestbookName);
-				_getListGreetingDeferred.then(_dohDeferred.getTestCallback(function(results){
+				var thisObject = this;
+				var dohDeferred = new doh.Deferred();
+				var getListGreetingDeferred = greetingStore.getListGreeting(guestbookName);
+				getListGreetingDeferred.then(dohDeferred.getTestCallback(function(results){
 					var expectation = {
-						"guestbook_name": _thisObject.guestbookName,
+						"guestbook_name": thisObject.guestbookName,
 						"greetings": [
 							{
 								"author" : "test_author",
@@ -146,17 +148,17 @@ define([
 						"is_more": false
 					};
 					doh.assertEqual(expectation, results);
-				}), _dohDeferred.getTestCallback(function(errors){
+				}), dohDeferred.getTestCallback(function(errors){
 					console.log("ERROR " + errors.message);
 				}));
 
 				this.fakeserver.respond();
-				return _dohDeferred;
+				return dohDeferred;
 			},
 			tearDown: function(){
-				this.GreetingStore = null;
-				this.guestbookName = null;
-				this.greetingContent = null;
+				greetingStore = null;
+				guestbookName = null;
+				greetingContent = null;
 				this.fakeserver.restore();
 			}
 		}
