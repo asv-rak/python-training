@@ -11,7 +11,7 @@ define([
 			name: "Test_Button_Switch_onclick_count",
 			runTest: function(){
 				var deferred = new doh.Deferred();
-				var guestbookView = new GuestbookView();
+				var guestbookView = new GuestbookView({autoLoadData: false});
 				var onclickSwitchBtnSpy = sinon.spy(guestbookView, "_onclickSwitchBtn");
 
 				setTimeout(deferred.getTestCallback(function(){
@@ -55,7 +55,7 @@ define([
 			},
 			runTest: function(){
 				var deferred = new doh.Deferred();
-				var guestbookView = new GuestbookView();
+				var guestbookView = new GuestbookView({autoLoadData: true});
 				var greetingContainer = guestbookView.greetingsContainerNode;
 				setTimeout(deferred.getTestCallback(function(){
 					doh.is(1, greetingContainer.childElementCount);
